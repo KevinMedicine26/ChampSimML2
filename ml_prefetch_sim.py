@@ -180,13 +180,12 @@ def run_command():
 
     parser = argparse.ArgumentParser(usage=argparse.SUPPRESS, add_help=False)
     parser.add_argument('execution_trace', default=None)
-    parser.add_argument('--prefetch', default=None)
-    parser.add_argument('--no-base', default=False, action='store_true')
-    parser.add_argument('--results-dir', default=default_results_dir)
-    parser.add_argument('--num-instructions', default=None) #default_spec_instrs if execution_trace[0].isdigit() else default_gap_instrs)
-    parser.add_argument('--num-prefetch-warmup-instructions', default=default_warmup_instrs)
-    parser.add_argument('--seed-file', default=default_seed_file)
-    parser.add_argument('--name', default='from_file')
+    parser.add_argument('--prefetch', default=None, help='Path to prefetcher file')
+    parser.add_argument('--no-base', default=False, action='store_true', help='Do not run baseline prefetchers')
+    parser.add_argument('--results-dir', default=default_results_dir, help='Directory to store results')
+    parser.add_argument('--num-instructions', default=None, help='Number of instructions to simulate')
+    parser.add_argument('--seed-file', default=default_seed_file, help='Path to seed file')
+    parser.add_argument('--name', default='from_file', help='Name for the prefetcher in results')
 
     args = parser.parse_args(sys.argv[2:])
 
@@ -212,6 +211,7 @@ def run_command():
     if not os.path.exists(args.results_dir):
         os.makedirs(args.results_dir, exist_ok=True)
 
+    # Run baseline prefetchers if requested
     if not args.no_base:
         for name, binary in zip(baseline_names, baseline_binaries):
             if not os.path.exists(binary):
@@ -219,38 +219,41 @@ def run_command():
                 exit(-1)
 
             if seed is not None:
-                cmd = '{binary} -prefetch_warmup_instructions {warm}000000 -simulation_instructions {sim}000000 -seed {seed} -traces {trace} > {results}/{base_trace}-{base_binary}.txt 2>&1'.format(
-                    binary=binary, warm=args.num_prefetch_warmup_instructions, sim=args.num_instructions,
+                cmd = '{binary} -simulation_instructions {sim}000000 -seed {seed} -traces {trace} > {results}/{base_trace}-{base_binary}.txt 2>&1'.format(
+                    binary=binary, sim=args.num_instructions,
                     trace=execution_trace, seed=seed, results=args.results_dir,
                     base_trace=os.path.basename(execution_trace), base_binary=os.path.basename(binary))
             else:
-                cmd = '{binary} -prefetch_warmup_instructions {warm}000000 -simulation_instructions {sim}000000 -traces {trace} > {results}/{base_trace}-{base_binary}.txt 2>&1'.format(
-                    binary=binary, warm=args.num_prefetch_warmup_instructions, sim=args.num_instructions,
+                cmd = '{binary} -simulation_instructions {sim}000000 -traces {trace} > {results}/{base_trace}-{base_binary}.txt 2>&1'.format(
+                    binary=binary, sim=args.num_instructions,
                     trace=execution_trace, results=args.results_dir, base_trace=os.path.basename(execution_trace),
                     base_binary=os.path.basename(binary))
 
             print('Running "' + cmd + '"')
-
             os.system(cmd)
 
+    # Run custom prefetcher if provided
     if args.prefetch is not None:
         if not os.path.exists(default_prefetcher_binary):
             print('Prefetcher ChampSim binary not found')
             exit(-1)
 
+        if not os.path.exists(args.prefetch):
+            print('Prefetcher file "' + args.prefetch + '" not found')
+            exit(-1)
+
         if seed is not None:
-            cmd = '<{prefetch} {binary} -prefetch_warmup_instructions {warm}000000 -simulation_instructions {sim}000000 -seed {seed} -traces {trace} > {results}/{base_trace}-{base_binary}.txt 2>&1'.format(
-                prefetch=args.prefetch, binary=default_prefetcher_binary, warm=args.num_prefetch_warmup_instructions, sim=args.num_instructions,
+            cmd = '<{prefetch} {binary} -simulation_instructions {sim}000000 -seed {seed} -traces {trace} > {results}/{base_trace}-{base_binary}.txt 2>&1'.format(
+                prefetch=args.prefetch, binary=default_prefetcher_binary, sim=args.num_instructions,
                 trace=execution_trace, seed=seed, results=args.results_dir,
-                base_trace=os.path.basename(execution_trace), base_binary=args.name)#os.path.basename(default_prefetcher_binary))
+                base_trace=os.path.basename(execution_trace), base_binary=args.name)
         else:
-            cmd = '<{prefetch} {binary} -prefetch_warmup_instructions {warm}000000 -simulation_instructions {sim}000000 -traces {trace} > {results}/{base_trace}-{base_binary}.txt 2>&1'.format(
-                prefetch=args.prefetch, binary=default_prefetcher_binary, warm=args.num_prefetch_warmup_instructions, sim=args.num_instructions,
+            cmd = '<{prefetch} {binary} -simulation_instructions {sim}000000 -traces {trace} > {results}/{base_trace}-{base_binary}.txt 2>&1'.format(
+                prefetch=args.prefetch, binary=default_prefetcher_binary, sim=args.num_instructions,
                 trace=execution_trace, results=args.results_dir, base_trace=os.path.basename(execution_trace),
-                base_binary=args.name)#os.path.basename(default_prefetcher_binary))
+                base_binary=args.name)
 
         print('Running "' + cmd + '"')
-
         os.system(cmd)
 
 def read_file(path, cache_level='LLC'):
