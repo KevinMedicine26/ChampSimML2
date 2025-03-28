@@ -1,0 +1,11 @@
+services:
+  champsim:
+    build: .
+    volumes:
+      - ./src:/champsim/src # 源代码挂载
+      - ./traces:/champsim/traces # 执行轨迹挂载
+      - ./load_traces:/champsim/load_traces # 加载轨迹挂载
+      - ./prefetchers:/champsim/prefetchers # 预取文件挂载
+      - ./results:/champsim/results # 结果挂载
+    working_dir: /champsim/src # 设置工作目录为src
+    tty: true

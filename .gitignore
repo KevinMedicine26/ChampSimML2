@@ -1,11 +1,11 @@
-prefetcher/l1i_prefetcher.cc
-prefetcher/l1d_prefetcher.cc
-prefetcher/l2c_prefetcher.cc
-prefetcher/llc_prefetcher.cc
-branch/branch_predictor.cc
-replacement/llc_replacement.cc
+# 排除大型数据文件
+traces/*
+load_traces/*
+prefetchers/*
+results/*
 
-inc/champsim.h.bak
-
-bin/
-obj/
+# 但保留文件夹结构
+!traces/.gitkeep
+!load_traces/.gitkeep
+!prefetchers/.gitkeep
+!results/.gitkeep
