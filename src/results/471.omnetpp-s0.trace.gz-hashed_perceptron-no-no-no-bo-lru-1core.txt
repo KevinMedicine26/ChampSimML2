@@ -1,0 +1,17 @@
+
+*** ChampSim Multicore Out-of-Order Simulator ***
+
+Warmup Instructions: 1000000
+Prefetch Warmup Instructions: 10000000
+Simulation Instructions: 300000000
+Number of CPUs: 1
+LLC sets: 2048
+LLC ways: 16
+Off-chip DRAM Size: 4096 MB Channels: 1 Width: 64-bit Data Rate: 3200 MT/s
+
+CPU 0 runs /champsim/traces/471.omnetpp-s0.trace.gz
+Read seed: 1036
+
+Warmup complete CPU 0 instructions: 1000004 cycles: 363763 (Simulation time: 0 hr 0 min 2 sec) 
+
+Caught signal: 2

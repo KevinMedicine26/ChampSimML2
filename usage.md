@@ -37,6 +37,7 @@ docker-compose exec champsim bash
 
 ```bash
 cd /champsim/src
+
 python3 ml_prefetch_sim.py build
 ```
 
@@ -213,3 +214,10 @@ troubleshooting
 
 471.omnetpp-s0.txt.xz - 这是加载轨迹文件，应放在 load_traces/ 目录中
 prefetch14.txt - 这似乎是一个预取文件，应放在 prefetchers/ 目录中
+
+
+prefetch14_CF01S.txt
+
+471.omnetpp-s0.trace.gz
+compile之后:
+python3 ml_prefetch_sim.py run /champsim/traces/471.omnetpp-s0.trace.gz --prefetch /champsim/prefetchers/prefetch14_CF01S.txt
