@@ -206,3 +206,10 @@ troubleshooting
    - 执行轨迹文件包含完整的程序执行信息，用于全面评估系统性能
 
 简单来说，加载轨迹用于"学习"内存访问模式并生成预取策略，而执行轨迹则用于评估这些预取策略对整体系统性能的影响。
+
+471.omnetpp-s0.trace.gz - 这是执行轨迹文件，应放在 traces/ 目录中
+
+注意：文件扩展名是.gz 而不是.xz，ChampSim 通常使用.xz 格式，但应该也能处理.gz 格式
+
+471.omnetpp-s0.txt.xz - 这是加载轨迹文件，应放在 load_traces/ 目录中
+prefetch14.txt - 这似乎是一个预取文件，应放在 prefetchers/ 目录中
