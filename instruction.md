@@ -45,11 +45,13 @@ python3 ml_prefetch_sim.py build
 ```
 
 这将构建三个二进制文件：
+
 - 不带预取器的基准版本
 - 带有最佳偏移(Best Offset)预取器的版本
 - 可从文件读取预取指令的版本
 
 > **注意**：如果构建过程中出现错误，可能是脚本文件的行尾符号问题。使用以下命令修复：
+>
 > ```bash
 > apt-get update && apt-get install -y dos2unix
 > dos2unix build_champsim.sh
@@ -81,6 +83,7 @@ python3 /champsim/src/convert_txt_to_prefetch.py 输入文件 /champsim/prefetch
 ```
 
 选项说明：
+
 - `--format csv` - 指定输入格式为 CSV (默认为"default")
 - `--delimiter ","` - CSV 分隔符 (默认为逗号)
 - `--instr-col 0` - 指令 ID 在 CSV 中的列索引 (默认为 0)
@@ -103,6 +106,7 @@ python3 ml_prefetch_sim.py run /champsim/traces/轨迹文件.champsimtrace.xz --
 > **注意**：模拟可能需要较长时间运行（根据轨迹大小可能需要几分钟到几小时）。模拟器会定期输出"心跳"信息显示进度。
 
 其他可选参数：
+
 - `--results-dir 结果目录` - 指定结果输出目录 (默认为 `./results`)
 - `--num-instructions N` - 模拟的指令数（百万条）(默认为 SPEC:500, GAP:300)
 - `--name 自定义名称` - 为预取器指定一个名称 (默认为 "from_file")
@@ -114,6 +118,7 @@ python3 ml_prefetch_sim.py eval
 ```
 
 这将生成一个 CSV 文件（默认为 `./stats.csv`），包含以下性能指标：
+
 - 准确率(Accuracy) - 有用预取的百分比
 - 覆盖率(Coverage) - 有用预取占总缺失的百分比
 - MPKI(每千指令缺失数) - 越低越好
@@ -126,6 +131,7 @@ python3 ml_prefetch_sim.py eval
 项目中有两种不同类型的轨迹文件：
 
 1. **执行轨迹文件** (`traces/` 目录，`.champsimtrace.xz` 格式)
+
    - 用于 ChampSim 模拟器的实际执行
    - 包含完整的程序执行信息，如指令地址、数据地址等
    - 用于评估处理器架构、缓存系统和预取策略的整体性能
@@ -138,6 +144,7 @@ python3 ml_prefetch_sim.py eval
 ## 预取文件格式
 
 预取文件格式要求：
+
 - 每行包含两个由空格分隔的值：`<指令ID> <预取地址>`
 - 每个指令 ID 最多可以有两个预取
 - 预取地址应为十六进制格式(不含"0x"前缀)
@@ -172,6 +179,7 @@ cat stats.csv
 ## 常见问题解决
 
 1. **脚本执行错误**：如果遇到 `./build_champsim.sh: not found` 错误，使用 `dos2unix` 转换脚本文件：
+
    ```bash
    apt-get update && apt-get install -y dos2unix
    dos2unix build_champsim.sh
@@ -182,3 +190,20 @@ cat stats.csv
 3. **模拟运行时间长**：ChampSim 是一个周期精确的模拟器，运行需要时间，请耐心等待。可以通过 `--no-base` 选项仅运行自定义预取器节省时间。
 
 4. **结果评估错误**：确保完整运行所有模拟，不要中途中断，否则可能导致评估结果不完整。
+
+example 1 ：
+
+TRACE
+首选：ML-DPC/LoadTraces/spec06/471.omnetpp-s0.txt.xz
+理由：
+471.omnetpp 是网络仿真程序，包含复杂的内存访问模式（不规则访问）、分支逻辑和适度的计算需求。
+它不像 bwaves（计算密集）或 mcf（内存密集）那样极端，适合测试通用预取器的适应性。
+.txt.xz 格式表明这是提取的负载数据，可能更轻量，专注于内存访问分析。
+适用性：适合需要平衡内存和计算的通用任务。
+
+下载地址
+ML-DPC/LoadTraces/spec06/471.omnetpp-s0.txt.xz
+https://utexas.box.com/shared/static/8shjfyw05w0n3prerb06rohsl08dfsmf.xz
+ML-DPC/ChampSimTraces/spec06/471.omnetpp-s0.trace.gz https://utexas.box.com/shared/static/1y1oq6c3q4zyf6rju2ejcc01xt5p25a6.gz
+
+prefetch14.txt 预取器文件
